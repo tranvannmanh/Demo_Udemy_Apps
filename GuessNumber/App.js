@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, ImageBackground, SafeAreaView } from 'react-native';
+import { StyleSheet, ScrollView, ImageBackground, SafeAreaView } from 'react-native';
 import StartGameScreen from './Screen/StartGameScreen';
 import LinearGradient from 'react-native-linear-gradient';
 import GameScreen from './Screen/GameScreen';
@@ -7,11 +7,12 @@ import GameOverScreen from './Screen/GameOverScreen';
 
 function App() {
   const [userNumber, setUserNumber] = useState();
-  const [gameIsOver, setGameOver] = useState(false);
+  const [gameIsOver, setGameOver] = useState(true);
   const [guessRounds, setGuessRound] = useState(0);
 
-  function pickUserNumber(pickedNumber) {
+  function pickNumberHandler(pickedNumber) {
     setUserNumber(pickedNumber);
+    setGameOver(false);
   }
 
   function startNewGameHandler() {
@@ -19,13 +20,18 @@ function App() {
     setGuessRound(0);
   }
 
-  let screen = <StartGameScreen onPickNumber={pickUserNumber} gameStart={setGameOver}/>
-  
-  if (userNumber && !gameIsOver) {
-    screen = <GameScreen userNumber={userNumber} gameIsOver={setGameOver}/>
+  function onGameOverHandler(guessRounds) {
+    setGameOver(true);
+    setGuessRound(guessRounds);
   }
 
-  if (gameIsOver) {
+  let screen = <StartGameScreen onPickNumber={pickNumberHandler}/>
+  
+  if (userNumber && !gameIsOver) {
+    screen = <GameScreen userNumber={userNumber} onGameOver={onGameOverHandler}/>
+  }
+
+  if (gameIsOver && userNumber) {
     screen = <GameOverScreen
       userNumber={userNumber}
       onStartNewGame={startNewGameHandler}
@@ -34,21 +40,21 @@ function App() {
   }
 
   return (
-    <LinearGradient
-      style={styles.rootScreen}
-      colors={['#8b1b0c', '#cc8c16']}
-    >
-      <ImageBackground
-        source={require('./Images/dices.png')}
+      <LinearGradient
         style={styles.rootScreen}
-        resizeMode='cover'
-        imageStyle={styles.backgroundImage}
-      >
-        <SafeAreaView style={styles.rootScreen}>
-          {screen}
-        </SafeAreaView>
-      </ImageBackground>
-    </LinearGradient>
+        colors={['#8b1b0c', '#cc8c16']}
+        >
+        <ImageBackground
+          source={require('./Images/dices.png')}
+          style={styles.rootScreen}
+          resizeMode='cover'
+          imageStyle={styles.backgroundImage}
+          >
+          <SafeAreaView style={styles.rootScreen}>
+            {screen}
+          </SafeAreaView>
+        </ImageBackground>
+      </LinearGradient>
   )
 }
 

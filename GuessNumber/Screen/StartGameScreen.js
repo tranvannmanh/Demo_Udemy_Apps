@@ -6,12 +6,11 @@ import PrimaryButton from '../Components/ui/PrimaryButton';
 import Title from '../Components/ui/Title';
 import Color from '../constants/color';
 
-function StartGameScreen({ onPickNumber, gameStart }) {
+function StartGameScreen({ onPickNumber }) {
     const [enteredNumber, setEnteredNumber] = useState('');
 
     function inputHandler(enteredText) {
         setEnteredNumber(enteredText);
-        gameStart(false);
     }
     
     function resetInputHandler() {

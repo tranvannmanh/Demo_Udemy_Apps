@@ -51,5 +51,6 @@ const styles = StyleSheet.create({
     },
     hightlight: {
         color: Color.startGameScreenButton,
-    }
+    },
+    
 })
