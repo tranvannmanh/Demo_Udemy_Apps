@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { View, Text, StyleSheet, Alert, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Alert, FlatList,useWindowDimensions } from 'react-native';
 import GuessLog from '../Components/game/GuessLog';
 import NumberContainer from '../Components/game/NumberContainer';
 import Card from '../Components/ui/Card';
@@ -44,7 +44,7 @@ function GameScreen({userNumber, onGameOver}) {
         setCurrentGuess(newRandNumber);
         setGuessRounds(prevGuess => [newRandNumber, ...prevGuess]);
     }
-
+    
     useEffect(() => {
         if (currentGuess === userNumber)
             onGameOver(guessRounds.length);
@@ -54,12 +54,11 @@ function GameScreen({userNumber, onGameOver}) {
         minBoundary = 1;
         maxBoundary = 100;
     }, []);
-
+    
     const guessRoundListLength = guessRounds.length;
-
-    return (
-        <View style={styles.screen}>
-            <Title>Opponent's guess</Title>
+    const { width, height } = useWindowDimensions();
+    let content = (
+        <>
             <NumberContainer>{currentGuess}</NumberContainer>
             <Card>
                 <InstructionText style={styles.instructionText}>Higher or Lower?</InstructionText>
@@ -72,12 +71,36 @@ function GameScreen({userNumber, onGameOver}) {
                     </View>
                 </View>
             </Card>
-            <View style={styles.listContainer}>
-                {/* {guessRounds.map(round => <Text key={round}>{round}</Text>)} */}
+        </>
+    )
+
+    if (width > 500) {
+        content = (
+            <>
+                <View style={styles.buttonsContainerWide}>
+                    <View style={styles.buttonContainer}>
+                        <PrimaryButton onPress={nextGuessHandler.bind(this, 'higher')}>+</PrimaryButton>
+                    </View>
+                    <NumberContainer>{currentGuess}</NumberContainer>
+                    <View style={styles.buttonContainer}>
+                        <PrimaryButton onPress={nextGuessHandler.bind(this, 'lower')}>-</PrimaryButton>
+                    </View>
+                </View>
+            </>
+        )
+    }
+
+    const marginTopDistance = height <= width ? 0 : 24;
+    return (
+        <View style={styles.screen}>
+            <Title>Opponent's guess</Title>
+            {content}
+            <View style={[styles.listContainer, {marginTop: marginTopDistance}]}>
                 <FlatList
+                    style={styles.FlatList}
                     data={guessRounds}
                     renderItem={itemData => <GuessLog roundNumber={ guessRoundListLength - itemData.index} guess={itemData.item}/>}
-                    keyExtractor={item => item}
+                    keyExtractor={itemData => itemData}
                 />
             </View>
         </View>
@@ -86,15 +109,21 @@ function GameScreen({userNumber, onGameOver}) {
 
 export default GameScreen;
 
+// const deviceHeight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
     screen: {
         flex: 1,
         padding: 24,
-        // backgroundColor: Color.backgroundGameScreen,
+        alignItems: 'center',
     },
 
     buttonsContainer: {
         flexDirection: 'row',
+    },
+
+    buttonsContainerWide: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
 
     instructionText: {
@@ -106,6 +135,13 @@ const styles = StyleSheet.create({
     },
     listContainer: {
         flex: 1,
-        padding: 16,
+        // marginTop: deviceHeight <= 800 ? 16 : 32,
+        // backgroundColor: 'blue',
+    },
+
+    FlatList: {
+        width: 300,
+        maxWidth: '80%',
+        // backgroundColor: 'red',
     }
 })
